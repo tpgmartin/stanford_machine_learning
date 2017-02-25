@@ -70,7 +70,7 @@ a2 = sigmoid(z2);
 
 a2 = [ones(m, 1) a2];
 z3 = a2 * Theta2';
-h = sigmoid(z3);
+a3 = sigmoid(z3);
 
 Theta1_reg = Theta1(:,2:end);
 Theta2_reg = Theta2(:,2:end);
@@ -79,13 +79,34 @@ y = eye(num_labels)(y,:);
 
 reg = sum(sum(Theta1_reg .** 2)) + sum(sum(Theta2_reg .** 2));
 
-J = (1 / m) .* sum(sum(-y .* log(h) - (1 - y) .* log(1 - h))) + (lambda / (2 * m)) .* (reg);
+J = (1 / m) .* sum(sum(-y .* log(a3) - (1 - y) .* log(1 - a3))) + (lambda / (2 * m)) .* (reg);
 
 % Part 2
 
+% 1. Feedforward in part 1
 
+% 2. Find delta^(3)_k
+
+delta3 = a3 - y
+
+% 3. Find delta^(2)
+
+delta2 = (delta3 * Theta2)(:,2:end) .* sigmoidGradient(z2);
+
+% 4. Accumulate the gradient
+
+Delta1 = delta2' * a1;
+Delta2 = delta3' * a2;
+
+% 5. Find unregularized gradient
+
+Theta1_unreg = (1 / m) * Delta1
+Theta2_unreg = (1 / m) * Delta2
 
 % Part 3
+
+Theta1_grad = Theta1_unreg + (lambda / m) * [zeros(hidden_layer_size, 1) Theta1_reg];
+Theta2_grad = Theta2_unreg + (lambda / m) * [zeros(num_labels, 1) Theta2_reg];
 
 % -------------------------------------------------------------
 
